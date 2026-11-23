@@ -43,7 +43,8 @@ jobs:
 
       - name: Build APK Release
         run: |
-          flutter create . --project-name promo_spesa --org com.promospesa --platforms android
+          sed -i 's/gradle-8.3-all.zip/gradle-8.4-all.zip/g' android/gradle/wrapper/gradle-wrapper.properties || true
+          sed -i 's/gradle-8.0-all.zip/gradle-8.4-all.zip/g' android/gradle/wrapper/gradle-wrapper.properties || true
           flutter build apk --release
 
       - name: Upload APK come Artifact
