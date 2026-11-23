@@ -29,14 +29,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Color _getBrandColor(String brand) {
     final b = brand.toLowerCase();
-    if (b.contains('conad')) return const Color(0xFFE11D48); // Rosso Conad
-    if (b.contains('coop')) return const Color(0xFFDC2626); // Rosso Coop
-    if (b.contains('esselunga')) return const Color(0xFF1E3A8A); // Blu Esselunga
-    if (b.contains('lidl')) return const Color(0xFF2563EB); // Blu Lidl
-    if (b.contains('eurospin')) return const Color(0xFF0284C7); // Celeste Eurospin
-    if (b.contains('carrefour')) return const Color(0xFF0D9488); // Teal
-    if (b.contains('despar') || b.contains('spar')) return const Color(0xFF16A34A); // Verde
-    return const Color(0xFF0F766E); // Default teal elegante
+    if (b.contains('conad')) return const Color(0xFFE11D48);
+    if (b.contains('coop')) return const Color(0xFFDC2626);
+    if (b.contains('esselunga')) return const Color(0xFF1E3A8A);
+    if (b.contains('lidl')) return const Color(0xFF2563EB);
+    if (b.contains('eurospin')) return const Color(0xFF0284C7);
+    if (b.contains('carrefour')) return const Color(0xFF0D9488);
+    if (b.contains('despar') || b.contains('spar')) return const Color(0xFF16A34A);
+    return const Color(0xFF0F766E);
   }
 
   @override
@@ -97,10 +97,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900), // Ottimizzato per Desktop/Web
+          constraints: const BoxConstraints(maxWidth: 900),
           child: Column(
             children: [
-              // Search & Store Filter Header
+              // Search & Filter Header
               Container(
                 margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                 padding: const EdgeInsets.all(16),
@@ -219,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // Lista Offerte
+              // Lista Offerte con Foto e Design Grafico
               Expanded(
                 child: StreamBuilder<List<PromoDeal>>(
                   stream: _dealsService.getActiveDealsStream(
@@ -259,7 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ],
                                 ),
-                                child: Icon(Icons.local_offer_outlined, size: 60, color: Colors.teal.shade300),
+                                child: Icon(Icons.shopping_cart_outlined, size: 60, color: Colors.teal.shade300),
                               ),
                               const SizedBox(height: 20),
                               const Text(
@@ -268,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Aggiungi una nuova promozione o registra un punto vendita!',
+                                'Aggiungi una nuova promozione con foto o registra un punto vendita!',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                               ),
@@ -280,8 +280,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     MaterialPageRoute(builder: (_) => const AddDealScreen()),
                                   );
                                 },
-                                icon: const Icon(Icons.add, size: 18),
-                                label: const Text('Inserisci Offerta'),
+                                icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
+                                label: const Text('Inserisci Offerta con Foto'),
                               ),
                             ],
                           ),
@@ -299,179 +299,265 @@ class _HomeScreenState extends State<HomeScreen> {
                         final discount = deal.discountPercentage;
 
                         return Card(
-                          margin: const EdgeInsets.only(bottom: 14),
+                          margin: const EdgeInsets.only(bottom: 16),
                           clipBehavior: Clip.antiAlias,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border(
-                                left: BorderSide(color: brandColor, width: 6),
-                              ),
-                            ),
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Negozio badge & Delete button
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: brandColor.withOpacity(0.12),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
+                          elevation: 1,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            side: BorderSide(color: Colors.grey.shade200, width: 1.2),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Immagine di copertina con badge sovrapposti
+                              Stack(
+                                children: [
+                                  Image.network(
+                                    deal.displayImage,
+                                    height: 160,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (ctx, err, stack) => Container(
+                                      height: 140,
+                                      color: Colors.grey.shade100,
+                                      child: const Center(
+                                        child: Icon(Icons.image_not_supported_outlined, size: 40, color: Colors.grey),
+                                      ),
+                                    ),
+                                    loadingBuilder: (ctx, child, progress) {
+                                      if (progress == null) return child;
+                                      return Container(
+                                        height: 140,
+                                        color: Colors.grey.shade100,
+                                        child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                      );
+                                    },
+                                  ),
+                                  // Gradient Overlay per leggibilità
+                                  Positioned.fill(
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.black.withOpacity(0.4),
+                                            Colors.transparent,
+                                            Colors.black.withOpacity(0.6),
+                                          ],
+                                          stops: const [0.0, 0.4, 1.0],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  // Badge Negozio in alto a sinistra
+                                  Positioned(
+                                    top: 12,
+                                    left: 12,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: brandColor,
+                                        borderRadius: BorderRadius.circular(20),
+                                        boxShadow: [
+                                          BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 6),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.store, color: Colors.white, size: 14),
+                                          const SizedBox(width: 6),
+                                          Text(
                                             deal.storeBrand.toUpperCase(),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w800,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w900,
                                               fontSize: 12,
-                                              color: brandColor,
+                                              color: Colors.white,
                                               letterSpacing: 0.5,
                                             ),
                                           ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  // Badge Sconto in alto a destra
+                                  if (discount != null)
+                                    Positioned(
+                                      top: 12,
+                                      right: 12,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF97316),
+                                          borderRadius: BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 6),
+                                          ],
                                         ),
-                                        const SizedBox(width: 8),
+                                        child: Text(
+                                          '-${discount.toStringAsFixed(0)}%',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  // Categoria e Indirizzo sul fondo dell'immagine
+                                  Positioned(
+                                    bottom: 10,
+                                    left: 12,
+                                    right: 12,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withOpacity(0.55),
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: Text(
+                                            deal.category,
+                                            style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
                                         Text(
                                           deal.storeAddress,
-                                          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                          style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w500),
                                         ),
                                       ],
                                     ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete_outline_rounded, size: 20, color: Colors.grey.shade400),
-                                      onPressed: () => _dealsService.deleteDeal(deal.id),
-                                      tooltip: 'Elimina offerta',
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-
-                                // Nome Prodotto & Marca
-                                Text(
-                                  deal.productName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 19,
-                                    color: Color(0xFF0F172A),
-                                  ),
-                                ),
-                                if (deal.productBrand.isNotEmpty) ...[
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.label_outline_rounded, size: 14, color: Colors.grey.shade500),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        deal.productBrand,
-                                        style: TextStyle(
-                                          color: Colors.grey.shade700,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ],
-                                const SizedBox(height: 14),
+                              ),
 
-                                // Prezzo e Data di scadenza
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                              // Informazioni Prodotto, Prezzo e Scadenza
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Countdown scadenza
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: daysLeft <= 2
-                                            ? Colors.red.shade50
-                                            : const Color(0xFFF1F5F9),
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                          color: daysLeft <= 2
-                                              ? Colors.red.shade200
-                                              : Colors.grey.shade200,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.hourglass_bottom_rounded,
-                                            size: 15,
-                                            color: daysLeft <= 2 ? Colors.red.shade700 : const Color(0xFFF97316),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            daysLeft <= 0
-                                                ? 'Scade oggi'
-                                                : daysLeft == 1
-                                                    ? 'Ultimo giorno'
-                                                    : 'Scade tra $daysLeft gg (${_dateFormat.format(deal.endDate)})',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w700,
-                                              color: daysLeft <= 2 ? Colors.red.shade800 : const Color(0xFF334155),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                    // Prezzi
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                                      textBaseline: TextBaseline.alphabetic,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        if (discount != null) ...[
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            margin: const EdgeInsets.only(right: 8),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFF97316),
-                                              borderRadius: BorderRadius.circular(6),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                deal.productName,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w800,
+                                                  fontSize: 18,
+                                                  color: Color(0xFF0F172A),
+                                                ),
+                                              ),
+                                              if (deal.productBrand.isNotEmpty) ...[
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  'Marca: ${deal.productBrand}',
+                                                  style: TextStyle(
+                                                    color: Colors.grey.shade600,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 13,
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.delete_outline_rounded, size: 20, color: Colors.grey.shade400),
+                                          onPressed: () => _dealsService.deleteDeal(deal.id),
+                                          tooltip: 'Elimina offerta',
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 14),
+
+                                    // Prezzo e Scadenza
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        // Countdown
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: daysLeft <= 2
+                                                ? Colors.red.shade50
+                                                : const Color(0xFFF1F5F9),
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: daysLeft <= 2
+                                                  ? Colors.red.shade200
+                                                  : Colors.grey.shade200,
                                             ),
-                                            child: Text(
-                                              '-${discount.toStringAsFixed(0)}%',
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.alarm_rounded,
+                                                size: 15,
+                                                color: daysLeft <= 2 ? Colors.red.shade700 : const Color(0xFFF97316),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                daysLeft <= 0
+                                                    ? 'Scade oggi'
+                                                    : daysLeft == 1
+                                                        ? 'Ultimo giorno'
+                                                        : 'Scade tra $daysLeft gg (${_dateFormat.format(deal.endDate)})',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: daysLeft <= 2 ? Colors.red.shade800 : const Color(0xFF334155),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                        // Prezzo promozionale
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                                          textBaseline: TextBaseline.alphabetic,
+                                          children: [
+                                            if (deal.originalPrice != null) ...[
+                                              Text(
+                                                '€${deal.originalPrice!.toStringAsFixed(2)}',
+                                                style: TextStyle(
+                                                  decoration: TextDecoration.lineThrough,
+                                                  color: Colors.grey.shade400,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                            ],
+                                            Text(
+                                              '€${deal.promoPrice.toStringAsFixed(2)}',
                                               style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12,
+                                                fontSize: 26,
+                                                fontWeight: FontWeight.w900,
+                                                color: Color(0xFF0F766E),
+                                                letterSpacing: -0.5,
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                        if (deal.originalPrice != null) ...[
-                                          Text(
-                                            '€${deal.originalPrice!.toStringAsFixed(2)}',
-                                            style: TextStyle(
-                                              decoration: TextDecoration.lineThrough,
-                                              color: Colors.grey.shade400,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                        ],
-                                        Text(
-                                          '€${deal.promoPrice.toStringAsFixed(2)}',
-                                          style: const TextStyle(
-                                            fontSize: 26,
-                                            fontWeight: FontWeight.w900,
-                                            color: Color(0xFF0F766E),
-                                            letterSpacing: -0.5,
-                                          ),
+                                          ],
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         );
                       },
@@ -493,7 +579,7 @@ class _HomeScreenState extends State<HomeScreen> {
             MaterialPageRoute(builder: (_) => const AddDealScreen()),
           );
         },
-        icon: const Icon(Icons.add_rounded),
+        icon: const Icon(Icons.add_photo_alternate_rounded),
         label: const Text(
           'Nuova Offerta',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),

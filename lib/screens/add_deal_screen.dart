@@ -18,8 +18,22 @@ class _AddDealScreenState extends State<AddDealScreen> {
   Store? _selectedStore;
   final _productNameController = TextEditingController();
   final _productBrandController = TextEditingController();
+  final _imageUrlController = TextEditingController();
   final _promoPriceController = TextEditingController();
   final _originalPriceController = TextEditingController();
+
+  String _selectedCategory = 'Pasta & Riso';
+  final List<String> _categories = [
+    'Pasta & Riso',
+    'Frutta & Verdura',
+    'Carne & Pesce',
+    'Latticini & Formaggi',
+    'Colazione & Dolci',
+    'Bevande & Vini',
+    'Olio & Condimenti',
+    'Cura Casa & Persona',
+    'Altro',
+  ];
 
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(const Duration(days: 7));
@@ -63,6 +77,7 @@ class _AddDealScreenState extends State<AddDealScreen> {
     final promoPrice = double.tryParse(_promoPriceController.text.replaceAll(',', '.')) ?? 0.0;
     final originalPriceText = _originalPriceController.text.trim().replaceAll(',', '.');
     final originalPrice = originalPriceText.isNotEmpty ? double.tryParse(originalPriceText) : null;
+    final customImage = _imageUrlController.text.trim();
 
     final newDeal = PromoDeal(
       id: '',
@@ -71,6 +86,8 @@ class _AddDealScreenState extends State<AddDealScreen> {
       storeAddress: '${_selectedStore!.address}, ${_selectedStore!.city}',
       productName: _productNameController.text.trim(),
       productBrand: _productBrandController.text.trim(),
+      category: _selectedCategory,
+      imageUrl: customImage.isNotEmpty ? customImage : null,
       promoPrice: promoPrice,
       originalPrice: originalPrice,
       startDate: _startDate,
@@ -85,7 +102,7 @@ class _AddDealScreenState extends State<AddDealScreen> {
         SnackBar(
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          content: const Text('Offerta pubblicata con successo!'),
+          content: const Text('Offerta con immagine pubblicata con successo!'),
         ),
       );
       Navigator.pop(context);
@@ -98,7 +115,7 @@ class _AddDealScreenState extends State<AddDealScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Aggiungi Offerta'),
+        title: const Text('Aggiungi Offerta con Foto'),
       ),
       body: Center(
         child: ConstrainedBox(
@@ -132,7 +149,7 @@ class _AddDealScreenState extends State<AddDealScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Dettagli Promozione',
+                              'Dettagli Promozione & Categoria',
                               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
                             ),
                             const SizedBox(height: 16),
@@ -156,11 +173,31 @@ class _AddDealScreenState extends State<AddDealScreen> {
                               validator: (val) => val == null ? 'Seleziona un supermercato' : null,
                             ),
                             const SizedBox(height: 16),
+                            DropdownButtonFormField<String>(
+                              value: _selectedCategory,
+                              decoration: InputDecoration(
+                                labelText: 'Categoria Prodotto (assegna foto automatica)',
+                                prefixIcon: Icon(Icons.category_rounded, color: primaryColor),
+                                filled: true,
+                                fillColor: const Color(0xFFF8FAFC),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              ),
+                              items: _categories.map((cat) {
+                                return DropdownMenuItem<String>(
+                                  value: cat,
+                                  child: Text(cat),
+                                );
+                              }).toList(),
+                              onChanged: (val) {
+                                if (val != null) setState(() => _selectedCategory = val);
+                              },
+                            ),
+                            const SizedBox(height: 16),
                             TextFormField(
                               controller: _productNameController,
                               decoration: InputDecoration(
                                 labelText: 'Nome Prodotto',
-                                hintText: 'Es. Pasta Spaghetti n.5 1kg',
+                                hintText: 'Es. Spaghetti Barilla 1kg, Mozzarella Santa Lucia',
                                 prefixIcon: Icon(Icons.shopping_bag_outlined, color: primaryColor),
                                 filled: true,
                                 fillColor: const Color(0xFFF8FAFC),
@@ -180,6 +217,18 @@ class _AddDealScreenState extends State<AddDealScreen> {
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                               ),
                               validator: (val) => (val == null || val.trim().isEmpty) ? 'Inserisci la marca' : null,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _imageUrlController,
+                              decoration: InputDecoration(
+                                labelText: 'Link Immagine Personalizzata (Opzionale)',
+                                hintText: 'Incolla URL foto web o lascia vuoto per foto automatica',
+                                prefixIcon: Icon(Icons.image_outlined, color: primaryColor),
+                                filled: true,
+                                fillColor: const Color(0xFFF8FAFC),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                              ),
                             ),
                             const SizedBox(height: 16),
                             Row(
@@ -265,7 +314,7 @@ class _AddDealScreenState extends State<AddDealScreen> {
                           textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
                         ),
                         onPressed: _submitDeal,
-                        child: const Text('Pubblica Offerta'),
+                        child: const Text('Pubblica Offerta con Immagine'),
                       ),
                     ],
                   ),
