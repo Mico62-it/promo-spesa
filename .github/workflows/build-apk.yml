@@ -43,7 +43,7 @@ jobs:
 
       - name: Build APK Release
         run: |
-          flutter create . --org com.promospesa --platforms android
+          flutter create . --project-name promo_spesa --org com.promospesa --platforms android
           flutter build apk --release
 
       - name: Upload APK come Artifact
